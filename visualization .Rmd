@@ -1,0 +1,76 @@
+---
+title: "visualization"
+output: html_document
+date: "2023-10-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggridges)
+
+```
+
+```{r import the dataframe}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728", "USW00022534", "USS0023B17S"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2021-01-01",
+    date_max = "2022-12-31") |>
+  mutate(
+    name = recode(
+      id, 
+      USW00094728 = "CentralPark_NY", 
+      USW00022534 = "Molokai_HI",
+      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) |>
+  select(name, id, everything())
+
+```
+
+
+```{r advanced scatterplot }
+weather_df %>% 
+  ggplot(aes(x=tmin, y=tmax))+
+  geom_density2d()
+```
+
+
+```{r histgram }
+weather_df %>% 
+  ggplot(aes(x=tmax,color=name))+
+  geom_histogram() + 
+  facet_grid(. ~ name)
+```
+```{r different group in histgram }
+weather_df %>% 
+  ggplot(aes(x=tmax))+
+  geom_histogram()
+```
+```{r different way }
+weather_df %>% 
+  ggplot(aes(x=tmax, fill=name ))+
+  geom_histogram(position = "dodge")
+```
+```{r}
+weather_df %>% 
+  ggplot(aes(x=tmax, fill= name))+
+  geom_density(alpha=.5, adjust=.7,color= "red")
+```
+
+
+```{r}
+weather_df %>%
+  ggplot(aes(y=tmin, x=name, fill=name ))+
+  geom_violin()
+```
+
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x=tmin, y=name,color=name ))+
+  geom_density_ridges()
+```
+
